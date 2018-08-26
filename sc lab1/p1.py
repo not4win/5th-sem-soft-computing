@@ -1,6 +1,7 @@
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 import pandas as pd
+import numpy as np
 
 data=input("enter the name of the dataset file:")
 
@@ -25,9 +26,7 @@ def train(X_train,Y_train):
 		for i in range(X_train.shape[0]):
 			cr=list(X_train.iloc[i])
 			y=Y_train.iloc[i]
-			cost=0
-			for j in range(len(cr)):
-				cost+=weights[j]*cr[j]
+			cost=np.dot(cr,weights)
 			if(cost>0):
 				cost=1
 			else:
@@ -47,8 +46,7 @@ def testing(X_test,Y_test,weights):
 		cost=0
 		cr=list(X_test.iloc[i])
 		y=Y_test.iloc[i]
-		for j in range(len(weights)):
-			cost+=weights[j]*cr[j]
+		cost=np.dot(weights,cr)
 		if(cost>0):
 			cost=1
 		else:
