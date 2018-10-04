@@ -36,14 +36,48 @@ def fitness_evaluation(population):
 		scores.append(score)
 	return scores
 
-def selection_crossover(population,rate):
+def selection(f,population):
+	probability_f=[]   #probability fitness
+	selected_chromosome=[]
+	random_v=[]
+	for i in range(len(f)):
+		probability_f.append(0)
+	for i in range(len(f)):
+		probability_f[i]=f[i]/(sum(f))
+	cumulative_f=[]
+	for i in range(len(f)):
+		cumulative_f.append(0)
+		random_v.append(0)
+		selected_chromosome.append(0)
+	for i in range(len(f)):
+		for j in range(i+1):
+			cumulative_f[i]=cumulative_f[i]+probability_f[j]
+	for i in range(len(f)):
+		random_v[i]=random.uniform(0,1)	
+	for i in range(len(f)):
+		k=0
+		for j in range(len(f)):
+			if(random_v[i]>cumulative_f[j]):
+				k=k+1
+		selected_chromosome[i]=k
+	selected_chromosomes=[]
+	for i in selected_chromosome:
+		selected_chromosomes.append(str(population[i]))
+	return selected_chromosomes
+
+
+
+
+def crossover(population,rate):
 	lucky=random.sample(range(0,len(population)),int(rate*len(population)))
 	new_population=[]
 	count=0
 	for i in range(len(lucky)):
 		for j in range(i+1,len(lucky)):
-			x=population[lucky[i]][:12]+population[lucky[j]][12:]
-			y=population[lucky[j]][:12]+population[lucky[i]][12:]
+			point=random.sample(range(1,21),1)
+			point=point[0]
+			x=population[lucky[i]][:point]+population[lucky[j]][point:]
+			y=population[lucky[j]][:point]+population[lucky[i]][point:]
 			new_population.append(x)
 			new_population.append(y)
 			count+=2
@@ -74,10 +108,12 @@ for i in range(5):
 	scores=fitness_evaluation(popu)
 	print("The average scores are:{}".format(sum(scores)/len(scores)))
 	print(" ")
-	new_popu=selection_crossover(popu,0.25)
+	newpop=selection(scores,popu)
+	new_popu=crossover(newpop,0.25)
 	#print("The new population is:{}".format(new_popu))
 	popu=mutation(new_popu,0.1)
 	print("The new mutated population is:{}".format(popu))
+
 
 
 
