@@ -1,10 +1,11 @@
+from __future__ import division
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 import random
 import math
-
+kk=3
 class heapobj:
 
 	def __init__(self,dis,y):
@@ -13,10 +14,10 @@ class heapobj:
 
 
 def predict(X_train,X_test,Y_train,Y_test):
-	truep=0
-	truen=0
-	falsep=0
-	falsen=0
+	truep=0.01
+	truen=0.01
+	falsep=0.01
+	falsen=0.01
 	for i in range(X_test.shape[0]):
 		L=[]
 		KN=[]
@@ -33,10 +34,10 @@ def predict(X_train,X_test,Y_train,Y_test):
 			dist=math.sqrt(dist)
 			L.append(heapobj(dist,val))
 		L=sorted(L,key=lambda x:x.eq_dist)
-		for m in range(11):
+		for m in range(kk):
 			if L[m].y_val==0:
 				freq0=freq0+1
-		if freq0>=6:
+		if freq0>=kk//2:
 			pred=0
 		else:
 			pred=1
@@ -49,12 +50,7 @@ def predict(X_train,X_test,Y_train,Y_test):
 			falsen+=1
 		if(pred==actual and pred==0):
 			truen+=1
-		#print(string)
-		
-
-		print("Actual:",actual,"Predicted:",pred)
-	
-	print("Accuracy:",((truep+truen)/X_test.shape[0]),"Precision:",(truep/(truep+falsep)),"Recall:",(truep/(truep+falsen)))
+	return (truep+truen)/X_test.shape[0],(truep/(truep+falsep)),(truep/(truep+falsen))
 
 df=pd.read_csv("SPECT.csv")
 
@@ -66,6 +62,17 @@ X=df.iloc[:,:df.shape[1]-1]
 
 Y=df.iloc[:,df.shape[1]-1]
 
-X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.2)
-k=11
-predict(X_train,X_test,Y_train,Y_test)
+part=int(df.shape[0]/10)
+acc=0
+prec=0
+rec=0
+for i in range(10):
+	X_test=X.iloc[i*part:(i+1)*part,:]
+	Y_test=Y.iloc[i*part:(i+1)*part]
+	X_train=X
+	Y_train=Y
+	accx,precx,recx=predict(X_train,X_test,Y_train,Y_test)
+	acc+=accx
+	prec+=precx
+	rec+=recx
+print("Accuracy is:{} \nPrecision is:{}\nRecall is:{}".format(acc/10,prec/10,rec/10))
